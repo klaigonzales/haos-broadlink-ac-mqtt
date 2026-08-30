@@ -29,18 +29,22 @@ trigger:
   - platform: state
     entity_id: !input temp_sensor
 
+variables:
+  ac_mac_input: !input ac_mac
+  topic_prefix_input: !input topic_prefix
+
 condition:
   - condition: template
     value_template: "{{ trigger.to_state.state not in ['unavailable', 'unknown', 'none', ''] }}"
 
 action:
-  - action: mqtt.publish
+  - service: mqtt.publish
     data:
-      topic: >
-        {% set raw_mac = (!input ac_mac) | replace(':', '') | replace('-', '') | lower %}
-        {% set prefix = !input topic_prefix %}
+      topic: >-
+        {% set raw_mac = (ac_mac_input | string) | replace(':', '') | replace('-', '') | replace(' ', '') | lower %}
+        {% set prefix = (topic_prefix_input | string).rstrip('/') %}
         {% if raw_mac.startswith('/') %}
-          {{ raw_mac }}/ambient_temp/value
+          {{ raw_mac.rstrip('/') }}/ambient_temp/value
         {% else %}
           {{ prefix }}/{{ raw_mac }}/ambient_temp/value
         {% endif %}
