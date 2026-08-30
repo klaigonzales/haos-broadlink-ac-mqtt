@@ -1,7 +1,7 @@
-name: AC MQTT proxy for home assistant
-version: 0.9.0
-slug: broadlink-ac-mqtt
-description: Provides AC MQTT proxy for home assistant
+name: "AC MQTT proxy for home assistant"
+version: "0.9.0"
+slug: "broadlink-ac-mqtt"
+description: "Provides AC MQTT proxy for home assistant"
 url: "https://github.com/klaigonzales/haos-broadlink-ac-mqtt"
 panel_icon: "mdi:air-conditioner"
 stage: "stable"
