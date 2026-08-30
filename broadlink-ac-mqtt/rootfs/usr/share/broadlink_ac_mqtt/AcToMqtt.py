@@ -104,7 +104,7 @@ class AcToMqtt:
 			
 		##Make sure correct device id 
 		for device in discovered_devices:		  			
-			if device.devtype == 0x4E2a:
+			if device.devtype in broadlink.SUPPORTED_AC_DEVTYPES or (isinstance(device.devtype, int) and (device.devtype & 0xFF00) == 0x4E00):
 				devices[device.status['macaddress']] = device				
 		
 		return devices
@@ -155,6 +155,12 @@ class AcToMqtt:
 		##leaves the disconnect below to run, and publish() only queues the
 		##message: disconnecting straight after it can drop it on the floor.
 		try:
+			if hasattr(self, 'device_objects') and self.device_objects:
+				for key in self.device_objects:
+					try:
+						self._mqtt.publish(self.config["mqtt_topic_prefix"] + key + '/availability', 'offline', qos=0, retain=True)
+					except Exception:
+						pass
 			info = self._mqtt.publish(self.config["mqtt_topic_prefix"]+'LWT','offline',qos=0,retain=True)
 			info.wait_for_publish(timeout=5)
 			##wait_for_publish() returns quietly when it times out, so ask outright.
@@ -223,6 +229,7 @@ class AcToMqtt:
 				except Exception as e:
 					logger.warning("Polling device %s failed: %s" % (key, e))
 					logger.debug(traceback.format_exc())
+					self._publish(self.config["mqtt_topic_prefix"] + key + '/availability', 'offline', retain=True)
 					continue
 
 				#print status
@@ -319,36 +326,185 @@ class AcToMqtt:
 			
 		return devices_array
 
-	def publish_mqtt_auto_discovery(self,devices):
-		##Nothing to announce is not fatal: every device may simply be unreachable
-		##right now, and the poll loop retries. Killing the daemon here would undo
-		##the startup retry in make_device_objects().
+	def publish_mqtt_auto_discovery(self, devices):
 		if not devices:
 			logger.error("No devices to announce, either enable discovery or add them to config")
 			return
 
-		##Make an array
-		devices_array = self.make_devices_array_from_devices(devices)
-		if not devices_array:
-			logger.error("Auto discovery skipped, no devices could be described")
-			return
-
-		##If retain is set for MQTT, then retain it		
-		if(self.config["mqtt_auto_discovery_topic_retain"]):
-			retain = self.config["mqtt_auto_discovery_topic_retain"]
-			
-		else: 
-			retain = False	
+		retain = bool(self.config.get("mqtt_auto_discovery_topic_retain", False))
+		discovery_prefix = self.config.get("mqtt_auto_discovery_topic", "homeassistant")
+		topic_prefix = self.config.get("mqtt_topic_prefix", "/aircon")
+		if not topic_prefix.endswith('/'):
+			topic_prefix += '/'
 
 		logger.debug("HA config Retain set to: " + str(retain))
-			
-		##Loop da loop all devices and publish discovery settings
-		for key in devices_array:
-			device = devices_array[key]			
-			topic = self.config["mqtt_auto_discovery_topic"]+"/climate/"+key+"/config"
-			##Publish						
-			self._publish(topic,json.dumps(device), retain = retain)			
-				
+
+		for device in devices.values():
+			mac = device.status["macaddress"]
+			name = device.name if isinstance(device.name, str) else ""
+			name = name.encode('ascii', 'ignore').decode('utf-8').strip()
+			name = name or mac
+
+			device_info = {
+				"identifiers": [f"broadlink_ac_{mac}"],
+				"name": name,
+				"model": "Broadlink AC Controller",
+				"manufacturer": "Broadlink",
+				"sw_version": broadlink.version,
+			}
+			availability_topic = f"{topic_prefix}{mac}/availability"
+
+			# 1. Climate Entity
+			climate_config = {
+				"name": name,
+				"unique_id": f"broadlink_ac_{mac}",
+				"mode_command_topic": f"{topic_prefix}{mac}/mode_homeassistant/set",
+				"temperature_command_topic": f"{topic_prefix}{mac}/temp/set",
+				"fan_mode_command_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/set",
+				"swing_mode_command_topic": f"{topic_prefix}{mac}/fixation_v/set",
+				"current_temperature_topic": f"{topic_prefix}{mac}/ambient_temp/value",
+				"mode_state_topic": f"{topic_prefix}{mac}/mode_homeassistant/value",
+				"temperature_state_topic": f"{topic_prefix}{mac}/temp/value",
+				"fan_mode_state_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/value",
+				"swing_mode_state_topic": f"{topic_prefix}{mac}/fixation_v/value",
+				"fan_modes": ["Auto", "Low", "Medium", "High", "Turbo", "Mute"],
+				"modes": ["off", "cool", "heat", "fan_only", "dry", "auto"],
+				"swing_modes": ["TOP", "MIDDLE1", "MIDDLE2", "MIDDLE3", "BOTTOM", "SWING", "AUTO"],
+				"max_temp": 32.0,
+				"min_temp": 16.0,
+				"temperature_unit": "C",
+				"precision": 0.1,
+				"temp_step": 0.5,
+				"device": device_info,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"availability_topic": availability_topic,
+			}
+			self._publish(f"{discovery_prefix}/climate/{mac}/config", json.dumps(climate_config), retain=retain)
+
+			# 2. Ambient Temperature Sensor
+			temp_sensor_config = {
+				"name": f"{name} Temperature",
+				"unique_id": f"broadlink_ac_{mac}_ambient_temp",
+				"device_class": "temperature",
+				"state_class": "measurement",
+				"unit_of_measurement": "°C",
+				"state_topic": f"{topic_prefix}{mac}/ambient_temp/value",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/sensor/{mac}_temp/config", json.dumps(temp_sensor_config), retain=retain)
+
+			# 3. Display (Light) Switch
+			display_switch_config = {
+				"name": f"{name} Display",
+				"unique_id": f"broadlink_ac_{mac}_display",
+				"icon": "mdi:television-ambient-light",
+				"command_topic": f"{topic_prefix}{mac}/display/set",
+				"state_topic": f"{topic_prefix}{mac}/display/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_display/config", json.dumps(display_switch_config), retain=retain)
+
+			# 4. Health / Ionizer Switch
+			health_switch_config = {
+				"name": f"{name} Health",
+				"unique_id": f"broadlink_ac_{mac}_health",
+				"icon": "mdi:air-filter",
+				"command_topic": f"{topic_prefix}{mac}/health/set",
+				"state_topic": f"{topic_prefix}{mac}/health/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_health/config", json.dumps(health_switch_config), retain=retain)
+
+			# 5. Turbo Switch
+			turbo_switch_config = {
+				"name": f"{name} Turbo",
+				"unique_id": f"broadlink_ac_{mac}_turbo",
+				"icon": "mdi:fan-speed-3",
+				"command_topic": f"{topic_prefix}{mac}/turbo/set",
+				"state_topic": f"{topic_prefix}{mac}/turbo/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_turbo/config", json.dumps(turbo_switch_config), retain=retain)
+
+			# 6. Mute Switch
+			mute_switch_config = {
+				"name": f"{name} Mute",
+				"unique_id": f"broadlink_ac_{mac}_mute",
+				"icon": "mdi:volume-mute",
+				"command_topic": f"{topic_prefix}{mac}/mute/set",
+				"state_topic": f"{topic_prefix}{mac}/mute/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_mute/config", json.dumps(mute_switch_config), retain=retain)
+
+			# 7. Sleep Switch
+			sleep_switch_config = {
+				"name": f"{name} Sleep",
+				"unique_id": f"broadlink_ac_{mac}_sleep",
+				"icon": "mdi:sleep",
+				"command_topic": f"{topic_prefix}{mac}/sleep/set",
+				"state_topic": f"{topic_prefix}{mac}/sleep/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_sleep/config", json.dumps(sleep_switch_config), retain=retain)
+
+			# 8. Clean Switch
+			clean_switch_config = {
+				"name": f"{name} Clean",
+				"unique_id": f"broadlink_ac_{mac}_clean",
+				"icon": "mdi:broom",
+				"command_topic": f"{topic_prefix}{mac}/clean/set",
+				"state_topic": f"{topic_prefix}{mac}/clean/value",
+				"payload_on": "ON",
+				"payload_off": "OFF",
+				"state_on": "ON",
+				"state_off": "OFF",
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/switch/{mac}_clean/config", json.dumps(clean_switch_config), retain=retain)
+
 	def publish_mqtt_info(self,status,force_update = False) :	
 		##If auto discovery is used, then always update
 		if not force_update:
@@ -386,6 +542,8 @@ class AcToMqtt:
 			
 		##Set previous to current
 		self.previous_status[status['macaddress']] = status
+		##Per-device availability
+		self._publish(self.config["mqtt_topic_prefix"] + status['macaddress'] + '/availability', 'online', retain=True)
 		
 		return 
 

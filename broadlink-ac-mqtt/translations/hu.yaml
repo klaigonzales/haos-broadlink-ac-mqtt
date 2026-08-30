@@ -1,0 +1,73 @@
+configuration:
+  service:
+    name: "Szolgáltatás beállítások"
+    description: "Az AC-MQTT bridge háttérfolyamatának általános beállításai."
+    fields:
+      daemon_mode:
+        name: "Folyamatos háttérfutás (Daemon)"
+        description: "Ha be van kapcsolva, a kiegészítő folyamatosan fut és frissíti a klímák állapotát."
+      update_interval:
+        name: "Frissítési időköz (másodperc)"
+        description: "Milyen gyakran kérdezze le a klímák állapotát (alapértelmezett: 10 mp)."
+      self_discovery:
+        name: "Automatikus hálózati felderítés"
+        description: "Keresse-e meg automatikusan a helyi hálózaton lévő Broadlink klímákat (UDP broadcast)."
+      bind_to_ip:
+        name: "Kötés adott IP-címre"
+        description: "Ha több hálózati kártya van, megadható az interfész IP-címe (false = automatikus)."
+      debug:
+        name: "Részletes hibakeresési naplózás (Debug)"
+        description: "Minden lekérdezést, csomagot és MQTT üzenetet részletesen kiír a naplóba."
+      log_level:
+        name: "Fájl naplózási szint"
+        description: "A naplófájlba írt üzenetek részletessége."
+      log_level_console:
+        name: "Konzol naplózási szint"
+        description: "A Home Assistant felületén látható napló részletessége."
+  mqtt:
+    name: "MQTT beállítások"
+    description: "Kapcsolódás az MQTT brokerhez (Mosquitto)."
+    fields:
+      host:
+        name: "MQTT Kiszolgáló (Broker)"
+        description: "Hagyd üresen, ha a Home Assistant belső Mosquitto kiegészítőjét használod (automatikusan felismeri)."
+      port:
+        name: "MQTT Port"
+        description: "Alapértelmezett: 1883."
+      client_id:
+        name: "Kliens azonosító (Client ID)"
+        description: "Az MQTT kapcsolathoz használt egyedi azonosító."
+      user:
+        name: "Felhasználónév"
+        description: "Hagyd üresen belső Mosquitto esetén."
+      passwd:
+        name: "Jelszó"
+        description: "Hagyd üresen belső Mosquitto esetén."
+      topic_prefix:
+        name: "Topic előtag (Topic Prefix)"
+        description: "Az állapot- és parancstopicok gyökere (pl. /aircon)."
+      auto_discovery_topic:
+        name: "Home Assistant Discovery Topic"
+        description: "Alapértelmezett: homeassistant."
+      auto_discovery_topic_retain:
+        name: "Discovery üzenetek megtartása (Retain)"
+        description: "Megőrizze-e a broker a felderítési csomagokat."
+      discovery:
+        name: "Automatikus felderítés engedélyezése"
+        description: "Automatikusan hozza létre a klímákat és entitásokat a Home Assistantban."
+  devices:
+    name: "Klímaberendezések listája"
+    description: "A vezérelni kívánt klímák címei és nevei."
+    fields:
+      ip:
+        name: "Klíma IP-címe"
+        description: "A klíma helyi IP-címe a Wi-Fi hálózaton (pl. 192.168.1.50)."
+      mac:
+        name: "Klíma MAC-címe"
+        description: "A klíma Wi-Fi moduljának MAC-címe kettőspontok nélkül, kisbetűvel (pl. 34ea34xxxxxx)."
+      name:
+        name: "Klíma elnevezése"
+        description: "Barátságos név (pl. Nappali klíma, Hálószoba klíma)."
+      port:
+        name: "Klíma Port"
+        description: "Alapértelmezett: 80."

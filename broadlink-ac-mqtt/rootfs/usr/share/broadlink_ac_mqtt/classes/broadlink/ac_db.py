@@ -15,15 +15,15 @@ import struct
 
 version = "1.1.3"
 
-def gendevice(devtype , host, mac,name=None, cloud=None,update_interval = 0):
-	#print format(devtype,'02x')
-	##We only care about 1 device type...  
-	if devtype == 0x4E2a: # Danham Bush
-		return ac_db(host=host, mac=mac,name=name, cloud=cloud,devtype= devtype,update_interval = 0)
-	if devtype == 0xFFFFFFF: # test
-		return ac_db_debug(host=host, mac=mac,name=name, cloud=cloud,devtype= devtype,update_interval = 0)
+SUPPORTED_AC_DEVTYPES = [0x4E2a, 0x4E2b, 0x4E2c, 0x4E2d, 0x4E4d, 0x4F05]
+
+def gendevice(devtype, host, mac, name=None, cloud=None, update_interval=0):
+	if devtype == 0xFFFFFFF:
+		return ac_db_debug(host=host, mac=mac, name=name, cloud=cloud, devtype=devtype, update_interval=0)
+	elif devtype in SUPPORTED_AC_DEVTYPES or (isinstance(devtype, int) and (devtype & 0xFF00) == 0x4E00):
+		return ac_db(host=host, mac=mac, name=name, cloud=cloud, devtype=devtype, update_interval=0)
 	else:
-		return device(host=host, mac=mac,devtype =devtype,update_interval = update_interval)
+		return device(host=host, mac=mac, devtype=devtype, update_interval=update_interval)
 
 
 def discover(timeout=None, bind_to_ip=None):

@@ -1,0 +1,73 @@
+configuration:
+  service:
+    name: "Service Settings"
+    description: "General daemon options for the AC-MQTT bridge."
+    fields:
+      daemon_mode:
+        name: "Daemon Mode"
+        description: "Keep the service running continuously to monitor and update AC status."
+      update_interval:
+        name: "Update Interval (seconds)"
+        description: "How often to poll air conditioner status (default: 10s)."
+      self_discovery:
+        name: "Self Discovery"
+        description: "Automatically find Broadlink AC units on the local subnet via UDP broadcast."
+      bind_to_ip:
+        name: "Bind to Specific IP"
+        description: "Specify interface IP if running multiple network adapters (false = auto)."
+      debug:
+        name: "Debug Logging"
+        description: "Enable verbose diagnostic logs for polls, packets, and MQTT events."
+      log_level:
+        name: "File Log Level"
+        description: "Threshold for messages written to the log file."
+      log_level_console:
+        name: "Console Log Level"
+        description: "Threshold for messages displayed in Home Assistant add-on logs."
+  mqtt:
+    name: "MQTT Settings"
+    description: "Connection options for Mosquitto or external MQTT broker."
+    fields:
+      host:
+        name: "MQTT Broker Host"
+        description: "Leave empty to automatically use Home Assistant's internal Mosquitto broker."
+      port:
+        name: "MQTT Port"
+        description: "Default: 1883."
+      client_id:
+        name: "Client ID"
+        description: "Unique identifier for this MQTT client."
+      user:
+        name: "Username"
+        description: "Leave empty when using internal Mosquitto."
+      passwd:
+        name: "Password"
+        description: "Leave empty when using internal Mosquitto."
+      topic_prefix:
+        name: "Topic Prefix"
+        description: "Root prefix for state and command topics (e.g., /aircon)."
+      auto_discovery_topic:
+        name: "Home Assistant Discovery Topic"
+        description: "Default: homeassistant."
+      auto_discovery_topic_retain:
+        name: "Retain Discovery Messages"
+        description: "Whether discovery configuration payloads are retained."
+      discovery:
+        name: "Enable Discovery"
+        description: "Automatically publish discovery topics so HA creates entities without manual YAML."
+  devices:
+    name: "Air Conditioner Devices"
+    description: "List of target AC units to communicate with."
+    fields:
+      ip:
+        name: "Device IP Address"
+        description: "Static or DHCP reserved local IP address of the AC Wi-Fi dongle."
+      mac:
+        name: "Device MAC Address"
+        description: "MAC address without colons or spaces in lowercase hex (e.g. 34ea34xxxxxx)."
+      name:
+        name: "Friendly Name"
+        description: "Human-readable name (e.g. Living Room AC)."
+      port:
+        name: "Port"
+        description: "Default: 80."
