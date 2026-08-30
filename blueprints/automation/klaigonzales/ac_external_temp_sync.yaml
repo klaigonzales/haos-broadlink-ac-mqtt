@@ -44,6 +44,18 @@ action:
         {% set raw_mac = (ac_mac_input | string) | replace(':', '') | replace('-', '') | replace(' ', '') | lower %}
         {% set prefix = (topic_prefix_input | string).rstrip('/') %}
         {% if raw_mac.startswith('/') %}
+          {{ raw_mac.rstrip('/') }}/current_temp/value
+        {% else %}
+          {{ prefix }}/{{ raw_mac }}/current_temp/value
+        {% endif %}
+      payload: "{{ trigger.to_state.state }}"
+      retain: true
+  - service: mqtt.publish
+    data:
+      topic: >-
+        {% set raw_mac = (ac_mac_input | string) | replace(':', '') | replace('-', '') | replace(' ', '') | lower %}
+        {% set prefix = (topic_prefix_input | string).rstrip('/') %}
+        {% if raw_mac.startswith('/') %}
           {{ raw_mac.rstrip('/') }}/ext_temp/set
         {% else %}
           {{ prefix }}/{{ raw_mac }}/ext_temp/set
