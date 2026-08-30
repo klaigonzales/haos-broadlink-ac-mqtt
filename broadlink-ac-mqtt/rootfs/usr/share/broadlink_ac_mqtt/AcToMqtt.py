@@ -77,10 +77,19 @@ class AcToMqtt:
 
 	def __init__(self,config):
 		self.config = config
-		##connect_mqtt() starts the paho network thread before start() assigns the
-		##real device map, so callbacks must always find an attribute here.
 		self.device_objects = {}
-		""
+		self.device_ext_temp = {}
+		if "devices" in config and isinstance(config["devices"], list):
+			for d in config["devices"]:
+				if isinstance(d, dict) and "mac" in d:
+					try:
+						mac_clean = bytearray.fromhex(d["mac"]).hex().lower()
+						self.device_ext_temp[mac_clean] = {
+							"topic": d.get("ext_temp_topic", "").strip(),
+							"template": d.get("ext_temp_template", "").strip()
+						}
+					except Exception:
+						pass
 	def test(self,config):
 		
 		
@@ -365,6 +374,9 @@ class AcToMqtt:
 			availability_topic = f"{topic_prefix}{mac}/availability"
 
 			# 1. Climate Entity
+			ext_info = self.device_ext_temp.get(mac.lower(), {})
+			curr_temp_topic = ext_info.get("topic") or f"{topic_prefix}{mac}/ambient_temp/value"
+
 			climate_config = {
 				"name": name,
 				"unique_id": f"broadlink_ac_{mac}",
@@ -372,7 +384,7 @@ class AcToMqtt:
 				"temperature_command_topic": f"{topic_prefix}{mac}/temp/set",
 				"fan_mode_command_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/set",
 				"swing_mode_command_topic": f"{topic_prefix}{mac}/fixation_v/set",
-				"current_temperature_topic": f"{topic_prefix}{mac}/ambient_temp/value",
+				"current_temperature_topic": curr_temp_topic,
 				"mode_state_topic": f"{topic_prefix}{mac}/mode_homeassistant/value",
 				"temperature_state_topic": f"{topic_prefix}{mac}/temp/value",
 				"fan_mode_state_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/value",
@@ -390,6 +402,8 @@ class AcToMqtt:
 				"pl_not_avail": "offline",
 				"availability_topic": availability_topic,
 			}
+			if ext_info.get("template"):
+				climate_config["current_temperature_template"] = ext_info["template"]
 			self._publish(f"{discovery_prefix}/climate/{mac}/config", json.dumps(climate_config), retain=retain)
 
 			# 2. Ambient Temperature Sensor
@@ -899,6 +913,11 @@ class AcToMqtt:
 		sub_topic = self.config["mqtt_topic_prefix"]+ "+/+/set"
 		client.subscribe(sub_topic)
 		logger.debug('Listing on %s for messages' % (sub_topic))
+		if hasattr(self, "device_ext_temp") and self.device_ext_temp:
+			for ext in self.device_ext_temp.values():
+				if ext.get("topic"):
+					logger.info("Subscribing to external temperature topic: %s" % ext["topic"])
+					client.subscribe(ext["topic"])
 
 
 		##LWT

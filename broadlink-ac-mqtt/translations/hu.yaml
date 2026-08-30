@@ -71,3 +71,9 @@ configuration:
       port:
         name: "Klíma Port"
         description: "Alapértelmezett: 80."
+      ext_temp_topic:
+        name: "Külső hőmérséklet érzékelő MQTT topicja (Opcionális)"
+        description: "Ha van külső MQTT hőmérőd (pl. zigbee2mqtt/szoba_sensor vagy /aircon/folyoso/ext_temp), ide írd a topicját."
+      ext_temp_template:
+        name: "Külső hőmérséklet JSON sablon (Opcionális)"
+        description: "Ha a topic JSON-t küld, pl: {{ value_json.temperature }}"

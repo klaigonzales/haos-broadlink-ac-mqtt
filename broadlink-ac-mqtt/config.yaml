@@ -1,5 +1,5 @@
 name: AC MQTT proxy for home assistant
-version: 0.8.1
+version: 0.9.0
 slug: broadlink-ac-mqtt
 description: Provides AC MQTT proxy for home assistant
 url: "https://github.com/klaigonzales/haos-broadlink-ac-mqtt"
@@ -35,6 +35,8 @@ options:
       mac:  aabbccddeeff
       name: Room
       port: 80
+      ext_temp_topic: ""
+      ext_temp_template: ""
 schema:
   service:
     daemon_mode: bool
@@ -59,3 +61,5 @@ schema:
       mac:  str
       name: str
       port: port
+      ext_temp_topic: str?
+      ext_temp_template: str?

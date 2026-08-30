@@ -71,3 +71,9 @@ configuration:
       port:
         name: "Port"
         description: "Default: 80."
+      ext_temp_topic:
+        name: "External Temperature Sensor MQTT Topic (Optional)"
+        description: "External MQTT sensor topic to bind to this AC (e.g., zigbee2mqtt/room_sensor or /aircon/folyoso/ext_temp)."
+      ext_temp_template:
+        name: "External Temperature JSON Template (Optional)"
+        description: "Value template if topic sends JSON (e.g., {{ value_json.temperature }})."

@@ -1,5 +1,11 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 0.9.0
+
+- Added external temperature sensor binding support directly in add-on configuration (`ext_temp_topic` and `ext_temp_template`)
+- Created official Home Assistant Automation Blueprint (`ac_external_temp_sync.yaml`) to bind any Home Assistant temperature entity to the AC with zero YAML editing
+- Subscribed to custom external temperature topics automatically upon MQTT connect
+
 ## 0.8.1
 
 - Debounced per-device availability tracking (requires 3 consecutive dropped poll cycles before marking unavailable) to eliminate status flapping on Wi-Fi packet drops

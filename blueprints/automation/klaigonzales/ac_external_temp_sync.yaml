@@ -1,0 +1,49 @@
+blueprint:
+  name: "Broadlink AC Külső Hőmérséklet Szinkronizáló"
+  description: >
+    Automatikusan szinkronizálja bármely Home Assistant hőmérséklet-érzékelő (pl. Zigbee, Shelly, Sonoff, ESPHome vagy virtuális szenzor)
+    értékét a Broadlink klímával MQTT-n keresztül, így a klíma kártyáján a külső hőmérő valós mérése jelenik meg.
+  domain: automation
+  input:
+    temp_sensor:
+      name: "Külső Hőmérséklet Érzékelő"
+      description: "Válaszd ki azt a helyiség- vagy külső hőmérőt, amit a klímához szeretnél rendelni."
+      selector:
+        entity:
+          filter:
+            domain: sensor
+            device_class: temperature
+    ac_mac:
+      name: "Klíma MAC címe vagy Topicja"
+      description: "A klíma MAC címe (pl. 34ea34xxxxxx vagy c8f29axxxxxx) vagy a teljes topic (pl. /aircon/34ea34xxxxxx)."
+      selector:
+        text:
+    topic_prefix:
+      name: "Topic előtag"
+      description: "Az AC MQTT kiegészítőben beállított topic_prefix (alapértelmezett: /aircon)."
+      default: "/aircon"
+      selector:
+        text:
+
+trigger:
+  - platform: state
+    entity_id: !input temp_sensor
+
+condition:
+  - condition: template
+    value_template: "{{ trigger.to_state.state not in ['unavailable', 'unknown', 'none', ''] }}"
+
+action:
+  - action: mqtt.publish
+    data:
+      topic: >
+        {% set raw_mac = (!input ac_mac) | replace(':', '') | replace('-', '') | lower %}
+        {% set prefix = !input topic_prefix %}
+        {% if raw_mac.startswith('/') %}
+          {{ raw_mac }}/ambient_temp/value
+        {% else %}
+          {{ prefix }}/{{ raw_mac }}/ambient_temp/value
+        {% endif %}
+      payload: "{{ trigger.to_state.state }}"
+      retain: true
+mode: restart
