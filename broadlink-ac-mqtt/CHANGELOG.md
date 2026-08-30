@@ -1,6 +1,11 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
-## 0.7.1
+## 0.7.3
+
+- Enhanced Home Assistant Device Registry integration with structured device metadata
+- Added explicit climate modes (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`) and temp limits
+- Robust DNS / local IP resolution fallback for isolated and IoT VLAN networks
+- Updated GitHub Actions CI linting workflows
 
 - Switched to maintained upstream `Arbuzov/broadlink_ac_mqtt`
 - Base Python image updated to Python 3.13 / Alpine 3.22
