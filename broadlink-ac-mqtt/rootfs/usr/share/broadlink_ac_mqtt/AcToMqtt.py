@@ -73,6 +73,7 @@ class AcToMqtt:
 	last_update = {}
 	failed_polls = {}
 	availability_status = {}
+	external_temp = {}
 	device_startup_attempts = 5
 
 	def __init__(self,config):
@@ -375,7 +376,7 @@ class AcToMqtt:
 
 			# 1. Climate Entity
 			ext_info = self.device_ext_temp.get(mac.lower(), {})
-			curr_temp_topic = ext_info.get("topic") or f"{topic_prefix}{mac}/ambient_temp/value"
+			curr_temp_topic = ext_info.get("topic") or f"{topic_prefix}{mac}/current_temp/value"
 
 			climate_config = {
 				"name": name,
@@ -564,6 +565,12 @@ class AcToMqtt:
 					
 				break
 			
+		mac_addr = status['macaddress'].lower()
+		##If no external temperature sensor is overriding, mirror internal ambient temp to current_temp/value
+		if mac_addr not in self.external_temp and not self.device_ext_temp.get(mac_addr, {}).get("topic"):
+			if "ambient_temp" in status:
+				self._publish(self.config["mqtt_topic_prefix"] + status['macaddress'] + '/current_temp/value', status['ambient_temp'], retain=True)
+
 		##Set previous to current
 		self.previous_status[status['macaddress']] = status
 		##Per-device availability
@@ -889,6 +896,15 @@ class AcToMqtt:
 					return
 			except Exception as e:	
 				logger.critical(e)
+				return
+		elif function in ["ext_temp", "current_temp"]:
+			try:
+				ext_val = float(value)
+				self.external_temp[address.lower()] = ext_val
+				logger.info("External temperature override for %s: %.1f °C" % (address, ext_val))
+				self._publish(self.config["mqtt_topic_prefix"] + address + "/current_temp/value", str(ext_val), retain=True)
+			except Exception as e:
+				logger.warning("Invalid external temperature value %r for %s: %s" % (value, address, e))
 				return
 		else:
 			logger.debug("No function match")

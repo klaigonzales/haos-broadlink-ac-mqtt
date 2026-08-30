@@ -1,5 +1,10 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 0.9.2
+
+- Fixed temperature jumping/flapping: separated internal AC ambient temperature topic (`/ambient_temp/value`) from climate current temperature (`/current_temp/value`) and added dedicated external temperature override receiver (`/ext_temp/set`)
+- Updated Blueprint to publish to `/ext_temp/set` so external temperature overrides never conflict with internal hardware polling cycles
+
 ## 0.9.1
 
 - Included direct Blueprint import URL in documentation and changelog:

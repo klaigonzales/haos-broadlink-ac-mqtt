@@ -2,7 +2,7 @@ blueprint:
   name: "Broadlink AC Külső Hőmérséklet Szinkronizáló"
   description: >
     Automatikusan szinkronizálja bármely Home Assistant hőmérséklet-érzékelő (pl. Zigbee, Shelly, Sonoff, ESPHome vagy virtuális szenzor)
-    értékét a Broadlink klímával MQTT-n keresztül, így a klíma kártyáján a külső hőmérő valós mérése jelenik meg.
+    értékét a Broadlink klímával MQTT-n keresztül, így a klíma kártyáján ugrálás nélkül a külső hőmérő valós mérése jelenik meg.
   domain: automation
   input:
     temp_sensor:
@@ -44,9 +44,9 @@ action:
         {% set raw_mac = (ac_mac_input | string) | replace(':', '') | replace('-', '') | replace(' ', '') | lower %}
         {% set prefix = (topic_prefix_input | string).rstrip('/') %}
         {% if raw_mac.startswith('/') %}
-          {{ raw_mac.rstrip('/') }}/ambient_temp/value
+          {{ raw_mac.rstrip('/') }}/ext_temp/set
         {% else %}
-          {{ prefix }}/{{ raw_mac }}/ambient_temp/value
+          {{ prefix }}/{{ raw_mac }}/ext_temp/set
         {% endif %}
       payload: "{{ trigger.to_state.state }}"
       retain: true
