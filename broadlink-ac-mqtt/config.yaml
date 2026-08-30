@@ -1,35 +1,37 @@
 name: AC MQTT proxy for home assistant
-version: 0.6.2
+version: 0.7.1
 slug: broadlink-ac-mqtt
 description: Provides AC MQTT proxy for home assistant
 url: "https://github.com/klaigonzales/haos-broadlink-ac-mqtt"
 arch:
   - aarch64
   - amd64
-  - armhf
-  - armv7
-  - i386
 init: false
 image: "ghcr.io/klaigonzales/{arch}-addon-broadlink-ac-mqtt"
+services:
+  - mqtt:want
 options:
   service:
-    daemon_mode: True
+    daemon_mode: true
     update_interval: 10
-    self_discovery: False
-    bind_to_ip: False
+    self_discovery: false
+    bind_to_ip: false
+    debug: false
+    log_level: INFO
+    log_level_console: INFO
   mqtt:
-    host: addon_core_mosquitto
+    host: ""
     port: 1883
     client_id: ac_to_mqtt
-    user: koos
-    passwd: koos_se_password
+    user: ""
+    passwd: ""
     topic_prefix: /aircon
     auto_discovery_topic: homeassistant
-    auto_discovery_topic_retain: False
-    discovery: False
+    auto_discovery_topic_retain: false
+    discovery: false
   devices:
     - ip: 127.0.0.1
-      mac:  aabbccddeeff00
+      mac:  aabbccddeeff
       name: Room
       port: 80
 schema:
@@ -38,12 +40,15 @@ schema:
     update_interval: int
     self_discovery: bool
     bind_to_ip: bool
+    debug: bool?
+    log_level: list(DEBUG|INFO|WARNING|ERROR|CRITICAL)?
+    log_level_console: list(DEBUG|INFO|WARNING|ERROR|CRITICAL)?
   mqtt:
-    host: str
+    host: str?
     port: port
     client_id: str
-    user: str
-    passwd: str
+    user: str?
+    passwd: str?
     topic_prefix: str
     auto_discovery_topic: str
     auto_discovery_topic_retain: bool
