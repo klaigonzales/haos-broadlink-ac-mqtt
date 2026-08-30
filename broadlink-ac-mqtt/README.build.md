@@ -8,3 +8,4 @@ This add-on downloads the upstream Broadlink AC MQTT package during the image bu
 - Prefer maintained Python packages over deprecated crypto libraries where the runtime supports it.
 - Validate MQTT and device configuration before the long-running loop starts.
 - Add runtime monitoring for MQTT reconnects and per-device health.
+- Add a startup validation gate to fail fast when the broker or device list is invalid.
