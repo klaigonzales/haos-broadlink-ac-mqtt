@@ -83,14 +83,21 @@ A powerful Home Assistant OS (HAOS) Add-on to bridge **Broadlink-based Wi-Fi Air
 A klímához **kétféleképpen** rendelhetsz hozzá külső hőmérséklet-érzékelőt:
 
 ### Opció A: Automatizálási Sablonnal (Blueprint) — *Bármilyen Home Assistant szenzorhoz*
+
+[![Open your Home Assistant instance and show the blueprint import dialog with a specific blueprint pre-filled.](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fraw.githubusercontent.com%2Fklaigonzales%2Fhaos-broadlink-ac-mqtt%2Fmaster%2Fblueprints%2Fautomation%2Fklaigonzales%2Fac_external_temp_sync.yaml)
+
 Ha az érzékelőd Zigbee, Bluetooth, Shelly, ESPHome vagy virtuális szenzor:
+
+**Közvetlen import URL (Direct URL):**
+```text
+https://raw.githubusercontent.com/klaigonzales/haos-broadlink-ac-mqtt/master/blueprints/automation/klaigonzales/ac_external_temp_sync.yaml
+```
+
+**Telepítés lépései:**
 1. Nyisd meg a Home Assistantban a **Beállítások -> Automatizmusok és jelenetek -> Sablonok (Blueprints)** menüt.
-2. Kattints a **Sablon importálása** gombra a jobb alsó sarokban.
-3. Másold be ezt az URL-t:
-   ```
-   https://github.com/klaigonzales/haos-broadlink-ac-mqtt/blob/master/blueprints/automation/klaigonzales/ac_external_temp_sync.yaml
-   ```
-4. Kattints az **Automatizmus létrehozása** gombra, majd a grafikus felületen:
+2. Kattints a **Sablon importálása** gombra a jobb alsó sarokban (vagy a fenti kék gombra).
+3. Illeszd be a fenti közvetlen URL-t.
+4. Kattints az **Automatizmus létrehozása** gombra, majd a felületen:
    - Válaszd ki a külső hőmérődet a legördülő listából.
    - Írd be a klímád MAC-címét (pl. `34ea34xxxxxx`).
    - Kattints a **Mentés** gombra!

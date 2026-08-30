@@ -1,9 +1,16 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 0.9.1
+
+- Included direct Blueprint import URL in documentation and changelog:
+  - Blueprint URL: `https://raw.githubusercontent.com/klaigonzales/haos-broadlink-ac-mqtt/master/blueprints/automation/klaigonzales/ac_external_temp_sync.yaml`
+  - 1-Click Import link: `https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fraw.githubusercontent.com%2Fklaigonzales%2Fhaos-broadlink-ac-mqtt%2Fmaster%2Fblueprints%2Fautomation%2Fklaigonzales%2Fac_external_temp_sync.yaml`
+
 ## 0.9.0
 
 - Added external temperature sensor binding support directly in add-on configuration (`ext_temp_topic` and `ext_temp_template`)
 - Created official Home Assistant Automation Blueprint (`ac_external_temp_sync.yaml`) to bind any Home Assistant temperature entity to the AC with zero YAML editing
+  - Blueprint: `https://github.com/klaigonzales/haos-broadlink-ac-mqtt/blob/master/blueprints/automation/klaigonzales/ac_external_temp_sync.yaml`
 - Subscribed to custom external temperature topics automatically upon MQTT connect
 
 ## 0.8.1
