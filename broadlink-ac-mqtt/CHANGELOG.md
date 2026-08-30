@@ -1,6 +1,8 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
-## 0.8.0
+## 0.8.1
+
+- Debounced per-device availability tracking (requires 3 consecutive dropped poll cycles before marking unavailable) to eliminate status flapping on Wi-Fi packet drops
 
 - Added automatic Home Assistant MQTT Discovery for extra entities:
   - Separate Ambient Temperature Sensor (`sensor.<ac>_temp`)

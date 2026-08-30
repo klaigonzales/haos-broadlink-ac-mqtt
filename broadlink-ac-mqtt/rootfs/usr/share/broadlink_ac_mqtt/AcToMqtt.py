@@ -71,6 +71,8 @@ def parse_device(device):
 class AcToMqtt:
 	previous_status = {}
 	last_update = {}
+	failed_polls = {}
+	availability_status = {}
 	device_startup_attempts = 5
 
 	def __init__(self,config):
@@ -227,13 +229,21 @@ class AcToMqtt:
 				try:
 					status = device.get_ac_status()
 				except Exception as e:
-					logger.warning("Polling device %s failed: %s" % (key, e))
+					self.failed_polls[key] = self.failed_polls.get(key, 0) + 1
+					logger.warning("Polling device %s failed (%s consecutive failures): %s" % (key, self.failed_polls[key], e))
 					logger.debug(traceback.format_exc())
-					self._publish(self.config["mqtt_topic_prefix"] + key + '/availability', 'offline', retain=True)
+					if self.failed_polls[key] >= 3:
+						if self.availability_status.get(key) != 'offline':
+							self.availability_status[key] = 'offline'
+							self._publish(self.config["mqtt_topic_prefix"] + key + '/availability', 'offline', retain=True)
 					continue
 
 				#print status
 				if status:
+					self.failed_polls[key] = 0
+					if self.availability_status.get(key) != 'online':
+						self.availability_status[key] = 'online'
+						self._publish(self.config["mqtt_topic_prefix"] + key + '/availability', 'online', retain=True)
 					##Update last time checked
 					self.last_update[key] = time.time()
 					self.publish_mqtt_info(status)
