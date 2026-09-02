@@ -1,5 +1,10 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 0.9.4
+
+- Documented available functions in the add-on Documentation tab (`DOCS.md`): climate, **vertical swing**, **horizontal swing**, fan, extra entities
+- Updated add-on store description to list vertical and horizontal swing
+
 ## 0.9.3
 
 - Exposed vertical louver/swing to Home Assistant as a dedicated MQTT `select` entity (`select.<ac>_fixation_v`) in addition to climate `swing_mode`

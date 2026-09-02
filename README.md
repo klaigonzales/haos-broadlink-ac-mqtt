@@ -3,9 +3,9 @@
 [![GitHub Release](https://img.shields.io/github/v/release/klaigonzales/haos-broadlink-ac-mqtt?color=blue)](https://github.com/klaigonzales/haos-broadlink-ac-mqtt/releases)
 [![License](https://img.shields.io/github/license/klaigonzales/haos-broadlink-ac-mqtt)](https://github.com/klaigonzales/haos-broadlink-ac-mqtt/blob/master/LICENSE)
 
-A powerful Home Assistant OS (HAOS) Add-on to bridge **Broadlink-based Wi-Fi Air Conditioners** (AUX, Dunham-Bush, TCL, Electrolux, etc.) with Home Assistant via MQTT with full auto-discovery and external temperature sensor binding support.
+A powerful Home Assistant OS (HAOS) Add-on to bridge **Broadlink-based Wi-Fi Air Conditioners** (AUX, Dunham-Bush, TCL, Electrolux, etc.) with Home Assistant via MQTT: climate modes, fan, **vertical swing**, **horizontal swing**, extra controls, auto-discovery and external temperature sensor binding.
 
-*Home Assistant OS kiegészítő Broadlink Wi-Fi modullal szerelt klímaberendezésekhez (AUX, Dunham-Bush, TCL, Electrolux stb.) MQTT protokollon, automatikus felderítésen és külső hőmérséklet-érzékelő támogatással.*
+*Home Assistant OS kiegészítő Broadlink Wi-Fi klímákhoz (AUX, Dunham-Bush, TCL, Electrolux stb.): üzemmód, ventilátor, **függőleges és vízszintes legyezés**, extra vezérlők, MQTT auto-discovery és külső hőmérő.*
 
 ---
 

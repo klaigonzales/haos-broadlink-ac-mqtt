@@ -4,10 +4,10 @@ Bridge between Broadlink-based Wi-Fi Air Conditioners (AUX, Dunham-Bush, TCL, et
 
 ---
 
-## Features
+## Features / Available functions
 
-- **Climate Entity:** Modes (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), fan speeds (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), vertical swing, horizontal swing, target temperature (`16°C – 32°C`, step: 0.5).
-- **Extra Entities:** Ambient temperature sensor, vertical/horizontal swing selects, display light switch, health/ionizer switch, turbo, mute, sleep, and self-clean switches.
+- **Climate Entity:** Modes (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), fan speeds (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), **vertical swing** (`swing_mode`), **horizontal swing** (`swing_horizontal_mode`), target temperature (`16°C – 32°C`, step: 0.5).
+- **Extra Entities:** Ambient temperature sensor, **vertical swing select**, **horizontal swing select**, display light switch, health/ionizer switch, turbo, mute, sleep, and self-clean switches.
 - **External Temperature Sensor Binding:** Bind external sensors (Zigbee, Shelly, BLE) via add-on config or official Blueprint.
 - **Per-Device Availability:** Offline status tracked per unit (`<topic_prefix>/<mac>/availability`).
 - **Automatic Mosquitto Integration:** Automatically fetches credentials from the Home Assistant Supervisor when `mqtt.host` is empty.
