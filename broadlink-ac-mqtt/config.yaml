@@ -1,5 +1,5 @@
 name: "AC MQTT proxy for home assistant"
-version: "0.9.2"
+version: "0.9.3"
 slug: "broadlink-ac-mqtt"
 description: "Provides AC MQTT proxy for home assistant"
 url: "https://github.com/klaigonzales/haos-broadlink-ac-mqtt"
@@ -28,7 +28,7 @@ options:
     passwd: ""
     topic_prefix: /aircon
     auto_discovery_topic: homeassistant
-    auto_discovery_topic_retain: false
+    auto_discovery_topic_retain: true
     discovery: false
   devices:
     - ip: 127.0.0.1

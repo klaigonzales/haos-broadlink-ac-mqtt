@@ -51,7 +51,7 @@ configuration:
         description: "Alapértelmezett: homeassistant."
       auto_discovery_topic_retain:
         name: "Discovery üzenetek megtartása (Retain)"
-        description: "Megőrizze-e a broker a felderítési csomagokat."
+        description: "A felderítési csomagok mindig megmaradnak, hogy az extra entitások (legyezés, kijelző, egészség stb.) HA újraindítás után is megmaradjanak."
       discovery:
         name: "Automatikus felderítés engedélyezése"
         description: "Automatikusan hozza létre a klímákat és entitásokat a Home Assistantban."

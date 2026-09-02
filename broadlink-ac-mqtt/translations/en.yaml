@@ -51,7 +51,7 @@ configuration:
         description: "Default: homeassistant."
       auto_discovery_topic_retain:
         name: "Retain Discovery Messages"
-        description: "Whether discovery configuration payloads are retained."
+        description: "Discovery payloads are always retained so extra entities (swing, display, health, …) survive a Home Assistant restart."
       discovery:
         name: "Enable Discovery"
         description: "Automatically publish discovery topics so HA creates entities without manual YAML."

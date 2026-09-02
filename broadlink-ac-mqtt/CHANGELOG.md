@@ -1,5 +1,12 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
 
+## 0.9.3
+
+- Exposed vertical louver/swing to Home Assistant as a dedicated MQTT `select` entity (`select.<ac>_fixation_v`) in addition to climate `swing_mode`
+- Exposed independent horizontal swing via climate `swing_horizontal_mode` and a dedicated MQTT `select` entity (`select.<ac>_fixation_h`)
+- Fixed horizontal swing status being read from the vertical louver bits (same 3 bits of payload byte 10); it now uses payload byte 11 as the protocol specifies
+- MQTT discovery configs are always retained so extra entities (swing selects, display, health, …) survive a Home Assistant restart and no longer lose out to an older retained climate payload
+
 ## 0.9.2
 
 - Fixed temperature jumping/flapping: separated internal AC ambient temperature topic (`/ambient_temp/value`) from climate current temperature (`/current_temp/value`) and added dedicated external temperature override receiver (`/ext_temp/set`)

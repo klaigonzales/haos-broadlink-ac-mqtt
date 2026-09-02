@@ -317,14 +317,17 @@ class AcToMqtt:
 				"temperature_command_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/temp/set",
 				"fan_mode_command_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fanspeed_homeassistant/set",
 				"swing_mode_command_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fixation_v/set",
+				"swing_horizontal_mode_command_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fixation_h/set",
 				"current_temperature_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/ambient_temp/value",
 				"mode_state_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/mode_homeassistant/value",
 				"temperature_state_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/temp/value",
 				"fan_mode_state_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fanspeed_homeassistant/value",
 				"swing_mode_state_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fixation_v/value",
+				"swing_horizontal_mode_state_topic": self.config["mqtt_topic_prefix"] + device.status["macaddress"] + "/fixation_h/value",
 				"fan_modes": ["Auto", "Low", "Medium", "High", "Turbo", "Mute"],
 				"modes": ["off", "cool", "heat", "fan_only", "dry", "auto"],
 				"swing_modes": ["TOP", "MIDDLE1", "MIDDLE2", "MIDDLE3", "BOTTOM", "SWING", "AUTO"],
+				"swing_horizontal_modes": ["LEFT_FIX", "LEFT_FLAP", "LEFT_RIGHT_FIX", "LEFT_RIGHT_FLAP", "RIGHT_FIX", "RIGHT_FLAP"],
 				"max_temp": 32.0,
 				"min_temp": 16.0,
 				"temperature_unit": "C",
@@ -351,7 +354,10 @@ class AcToMqtt:
 			logger.error("No devices to announce, either enable discovery or add them to config")
 			return
 
-		retain = bool(self.config.get("mqtt_auto_discovery_topic_retain", False))
+		##Discovery configs must be retained: otherwise HA loses extra entities
+		##(and swing selects) on restart, and an older retained climate payload
+		##can keep occupying homeassistant/climate/<mac>/config.
+		retain = True
 		discovery_prefix = self.config.get("mqtt_auto_discovery_topic", "homeassistant")
 		topic_prefix = self.config.get("mqtt_topic_prefix", "/aircon")
 		if not topic_prefix.endswith('/'):
@@ -385,14 +391,17 @@ class AcToMqtt:
 				"temperature_command_topic": f"{topic_prefix}{mac}/temp/set",
 				"fan_mode_command_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/set",
 				"swing_mode_command_topic": f"{topic_prefix}{mac}/fixation_v/set",
+				"swing_horizontal_mode_command_topic": f"{topic_prefix}{mac}/fixation_h/set",
 				"current_temperature_topic": curr_temp_topic,
 				"mode_state_topic": f"{topic_prefix}{mac}/mode_homeassistant/value",
 				"temperature_state_topic": f"{topic_prefix}{mac}/temp/value",
 				"fan_mode_state_topic": f"{topic_prefix}{mac}/fanspeed_homeassistant/value",
 				"swing_mode_state_topic": f"{topic_prefix}{mac}/fixation_v/value",
+				"swing_horizontal_mode_state_topic": f"{topic_prefix}{mac}/fixation_h/value",
 				"fan_modes": ["Auto", "Low", "Medium", "High", "Turbo", "Mute"],
 				"modes": ["off", "cool", "heat", "fan_only", "dry", "auto"],
 				"swing_modes": ["TOP", "MIDDLE1", "MIDDLE2", "MIDDLE3", "BOTTOM", "SWING", "AUTO"],
+				"swing_horizontal_modes": ["LEFT_FIX", "LEFT_FLAP", "LEFT_RIGHT_FIX", "LEFT_RIGHT_FLAP", "RIGHT_FIX", "RIGHT_FLAP"],
 				"max_temp": 32.0,
 				"min_temp": 16.0,
 				"temperature_unit": "C",
@@ -529,6 +538,36 @@ class AcToMqtt:
 				"device": device_info,
 			}
 			self._publish(f"{discovery_prefix}/switch/{mac}_clean/config", json.dumps(clean_switch_config), retain=retain)
+
+			# 9. Vertical swing / louver select (also mapped as climate swing_mode)
+			vertical_swing_config = {
+				"name": f"{name} Vertical Swing",
+				"unique_id": f"broadlink_ac_{mac}_fixation_v",
+				"icon": "mdi:arrow-up-down",
+				"command_topic": f"{topic_prefix}{mac}/fixation_v/set",
+				"state_topic": f"{topic_prefix}{mac}/fixation_v/value",
+				"options": ["TOP", "MIDDLE1", "MIDDLE2", "MIDDLE3", "BOTTOM", "SWING", "AUTO"],
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/select/{mac}_fixation_v/config", json.dumps(vertical_swing_config), retain=retain)
+
+			# 10. Horizontal swing / louver select (also mapped as climate swing_horizontal_mode)
+			horizontal_swing_config = {
+				"name": f"{name} Horizontal Swing",
+				"unique_id": f"broadlink_ac_{mac}_fixation_h",
+				"icon": "mdi:arrow-left-right",
+				"command_topic": f"{topic_prefix}{mac}/fixation_h/set",
+				"state_topic": f"{topic_prefix}{mac}/fixation_h/value",
+				"options": ["LEFT_FIX", "LEFT_FLAP", "LEFT_RIGHT_FIX", "LEFT_RIGHT_FLAP", "RIGHT_FIX", "RIGHT_FLAP"],
+				"availability_topic": availability_topic,
+				"pl_avail": "online",
+				"pl_not_avail": "offline",
+				"device": device_info,
+			}
+			self._publish(f"{discovery_prefix}/select/{mac}_fixation_h/config", json.dumps(horizontal_swing_config), retain=retain)
 
 	def publish_mqtt_info(self,status,force_update = False) :	
 		##If auto discovery is used, then always update

@@ -22,7 +22,9 @@ A powerful Home Assistant OS (HAOS) Add-on to bridge **Broadlink-based Wi-Fi Air
 - **Seamless MQTT Discovery:** Automatically creates Climate entities and exposes extra device controls without manual YAML configuration.
 - **External Temperature Sensor Binding:** Bind any external temperature sensor (Zigbee, Shelly, BLE, ESPHome, etc.) directly in add-on options or using our official Automation Blueprint.
 - **Dedicated Device Entities:**
-  - **Thermostat / Climate:** Modes (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), fan speeds (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), vertical swing, temperature setpoint (`16°C – 32°C`).
+  - **Thermostat / Climate:** Modes (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), fan speeds (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), vertical swing, horizontal swing, temperature setpoint (`16°C – 32°C`).
+  - **Vertical Swing (`select.<ac>_fixation_v`):** Louver position (`TOP`, `MIDDLE1`–`MIDDLE3`, `BOTTOM`, `SWING`, `AUTO`), also on the climate entity as `swing_mode`.
+  - **Horizontal Swing (`select.<ac>_fixation_h`):** Side-to-side louver, also on the climate entity as `swing_horizontal_mode`.
   - **Ambient Temperature Sensor (`sensor.<ac>_temp`):** Room temperature with `measurement` state class for long-term statistics & graphs.
   - **Display Switch (`switch.<ac>_display`):** Turn indoor unit LED panel on/off.
   - **Health / Plasma Switch (`switch.<ac>_health`):** Control ionizer / air purification.
@@ -64,7 +66,9 @@ A powerful Home Assistant OS (HAOS) Add-on to bridge **Broadlink-based Wi-Fi Air
 - **Automatikus Home Assistant MQTT felismerés (Auto-Discovery):** Kézi YAML konfiguráció nélkül hozza létre a klímát és a kapcsolódó vezérlőket.
 - **Külső hőmérséklet-érzékelő hozzárendelése:** Bármilyen szobai/külső hőmérő (Zigbee, Shelly, ESPHome stb.) hozzárendelhető a klíma kártyájához a konfigurációban vagy az automatizálási sablonnal.
 - **Dedikált eszközvezérlők:**
-  - **Klíma / Termosztát:** Módok (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), ventilátorfokozatok (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), lamellamozgatás, hőmérséklet állítás (`16°C – 32°C`).
+  - **Klíma / Termosztát:** Módok (`auto`, `cool`, `heat`, `dry`, `fan_only`, `off`), ventilátorfokozatok (`auto`, `low`, `medium`, `high`, `turbo`, `mute`), függőleges és vízszintes lamellamozgatás, hőmérséklet állítás (`16°C – 32°C`).
+  - **Függőleges legyezés (`select.<klima>_fixation_v`):** Lamellaállás (`TOP`, `MIDDLE1`–`MIDDLE3`, `BOTTOM`, `SWING`, `AUTO`), a klíma entitáson `swing_mode`-ként is.
+  - **Vízszintes legyezés (`select.<klima>_fixation_h`):** Oldalirányú lamella, a klíma entitáson `swing_horizontal_mode`-ként is.
   - **Helyiség Hőmérséklet Érzékelő (`sensor.<klima>_temp`):** Különálló szenzor grafikonokhoz és hosszú távú statisztikákhoz.
   - **Kijelző Kapcsoló (`switch.<klima>_display`):** Beltéri LED kijelző le-/felkapcsolása (pl. éjszakai automatizációhoz).
   - **Egészség / Plazma Kapcsoló (`switch.<klima>_health`):** Beépített ionizátor / légtisztító vezérlése.

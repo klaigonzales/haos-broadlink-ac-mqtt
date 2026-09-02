@@ -817,7 +817,7 @@ class ac_db(device):
 			self.status['display'] =response_payload[20] >> 4 & 0b00000001
 			self.status['mildew'] = response_payload[20] >> 3 & 0b00000001
 			self.status['health'] = response_payload[18] >> 1 & 0b00000001
-			self.status['fixation_h'] = response_payload[10]  & 0b00000111
+			self.status['fixation_h'] = response_payload[11] >> 5 & 0b00000111
 			self.status['fanspeed']  = response_payload[13] >> 5 & 0b00000111
 			self.status['ifeel'] = response_payload[15] >> 3& 0b00000001
 			self.status['mute'] = response_payload[14] >> 7& 0b00000001
@@ -852,7 +852,8 @@ class ac_db(device):
 		status_nice['display'] = self.get_key(self.STATIC.ONOFF.__dict__,status['display'])
 		status_nice['mildew'] = self.get_key(self.STATIC.ONOFF.__dict__,status['mildew'])
 		status_nice['health'] = self.get_key(self.STATIC.ONOFF.__dict__,status['health'])
-		status_nice['fixation_h'] = self.get_key(self.STATIC.FIXATION.HORIZONTAL.__dict__,status['fixation_h'])
+		fixation_h = self.get_key(self.STATIC.FIXATION.HORIZONTAL.__dict__,status['fixation_h'])
+		status_nice['fixation_h'] = fixation_h if isinstance(fixation_h,str) else 'LEFT_RIGHT_FIX'
 		
 		
 		status_nice['ifeel'] = self.get_key(self.STATIC.ONOFF.__dict__,status['ifeel'])
